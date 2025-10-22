@@ -8,9 +8,14 @@
                 <h2 class="fw-bold text-main">File Management</h2>
                 <p class="text-muted mb-0">Manage your uploaded files here.</p>
             </div>
-            <button class="btn btn-main" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                <i class="fa fa-upload"></i> Upload File
-            </button>
+            <div>
+                <a href="{{ route('files.trash') }}" class="btn btn-secondary me-2">
+                    <i class="fa fa-trash"></i> Trash
+                </a>
+                <button class="btn btn-main" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                    <i class="fa fa-upload"></i> Upload File
+                </button>
+            </div>
         </div>
 
         <!-- File Table -->

@@ -13,23 +13,38 @@ class DepartmentController extends Controller
         return view('departments.index', compact('departments'));
     }
 
+    public function create()
+    {
+        return view('departments.create');
+    }
+
     public function store(Request $request)
     {
         $request->validate(['name' => 'required|unique:departments']);
         Department::create($request->only('name'));
-        return back()->with('success', 'Department created.');
+        return redirect()->route('departments.index')->with('success', 'Department created.');
+    }
+
+    public function show(Department $department)
+    {
+        return view('departments.show', compact('department'));
+    }
+
+    public function edit(Department $department)
+    {
+        return view('departments.edit', compact('department'));
     }
 
     public function update(Request $request, Department $department)
     {
         $request->validate(['name' => 'required|unique:departments,name,' . $department->id]);
         $department->update($request->only('name'));
-        return back()->with('success', 'Department updated.');
+        return redirect()->route('departments.index')->with('success', 'Department updated.');
     }
 
     public function destroy(Department $department)
     {
         $department->delete();
-        return back()->with('success', 'Department deleted.');
+        return redirect()->route('departments.index')->with('success', 'Department deleted.');
     }
 }
