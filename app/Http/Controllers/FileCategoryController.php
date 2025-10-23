@@ -27,6 +27,7 @@ class FileCategoryController extends Controller
 
     public function show(FileCategory $category)
     {
+        $category->load('files.uploader');
         return view('categories.show', compact('category'));
     }
 

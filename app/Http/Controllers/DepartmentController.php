@@ -27,6 +27,7 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
+        $department->load('files.uploader');
         return view('departments.show', compact('department'));
     }
 
