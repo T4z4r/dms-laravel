@@ -37,9 +37,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
+                        <a class="nav-link d-flex align-items-center" href="{{ route('logout') }}" onclick="event.preventDefault(); confirmLogout();">
+                             <i class="fas fa-sign-out-alt me-2"></i> Logout
+                         </a>
                     </li>
                 </ul>
             </div>

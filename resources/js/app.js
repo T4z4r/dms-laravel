@@ -23,4 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editCategoryForm').action = `/categories/${id}`;
         });
     });
+
+    // Confirm logout will be handled via CDN
 });

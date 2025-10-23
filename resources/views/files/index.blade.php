@@ -392,11 +392,21 @@
         }
 
         function deleteFile(fileId, fileName) {
-            if (confirm(`Are you sure you want to delete "${fileName}"? This action cannot be undone.`)) {
-                const form = document.getElementById('deleteForm');
-                form.action = `/files/${fileId}`;
-                form.submit();
-            }
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You want to delete "${fileName}"? This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('deleteForm');
+                    form.action = `/files/${fileId}`;
+                    form.submit();
+                }
+            });
         }
 
         // Auto-refresh page after successful upload

@@ -47,12 +47,12 @@
                                         </button>
                                     </form>
                                     <form action="{{ route('files.forceDelete', $file->id) }}" method="POST" class="d-inline">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger"
-                                                onclick="return confirm('Permanently delete this file?')">
-                                            <i class="fa fa-trash"></i> Delete
-                                        </button>
-                                    </form>
+                                         @csrf @method('DELETE')
+                                         <button type="submit" class="btn btn-sm btn-danger"
+                                                 onclick="event.preventDefault(); confirmForceDelete('{{ $file->original_name }}', this.form);">
+                                             <i class="fa fa-trash"></i> Delete
+                                         </button>
+                                     </form>
                                 </td>
                             </tr>
                         @empty
@@ -66,4 +66,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function confirmForceDelete(fileName, form) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Permanently delete "${fileName}"? This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
 @endsection

@@ -43,12 +43,12 @@
                                         <i class="fa fa-edit"></i>
                                     </button>
                                     <form action="{{ route('departments.destroy', $department) }}" method="POST" class="d-inline">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Delete this department?')">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
+                                         @csrf @method('DELETE')
+                                         <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                 onclick="event.preventDefault(); confirmDeleteDepartment('{{ $department->name }}', this.form);">
+                                             <i class="fa fa-trash"></i>
+                                         </button>
+                                     </form>
                                 </td>
                             </tr>
                         @empty
@@ -111,4 +111,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function confirmDeleteDepartment(departmentName, form) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Delete "${departmentName}" department?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
 @endsection
