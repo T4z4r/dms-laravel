@@ -22,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/files/trash', [FileController::class,'trash'])->name('files.trash');
     Route::delete('/files/{file}', [FileController::class,'destroy'])->name('files.destroy');
     Route::get('/files/{file}/view', [FileController::class,'view'])->name('files.view');
+    Route::get('/files/{file}/details', [FileController::class,'details'])->name('files.details');
     Route::get('/files/{file}/download', [FileController::class,'download'])->name('files.download');
 
     Route::post('/files/{file}/share', [FileController::class,'share'])->name('files.share');
