@@ -22,6 +22,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('files.trash') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('files.trash') }}">
+                            <i class="fas fa-trash me-2"></i> Trash
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('departments.*') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('departments.index') }}">
                             <i class="fas fa-building me-2"></i> Departments
                         </a>
@@ -29,6 +34,11 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('categories.*') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('categories.index') }}">
                             <i class="fas fa-tags me-2"></i> Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark d-flex align-items-center" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
                     </li>
                 </ul>
