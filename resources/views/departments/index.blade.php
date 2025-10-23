@@ -5,11 +5,13 @@
         <!-- Hero Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold text-main">Departments</h2>
+                <h2 class="fw-bold text-main">
+                    <i class="fas fa-building me-2"></i>Departments
+                </h2>
                 <p class="text-muted mb-0">Manage departments here.</p>
             </div>
             <a href="{{ route('departments.create') }}" class="btn btn-main">
-                <i class="fa fa-plus"></i> Add Department
+                <i class="fas fa-plus me-2"></i>Add Department
             </a>
         </div>
 

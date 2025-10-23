@@ -5,15 +5,17 @@
         <!-- Hero Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold text-main">File Management</h2>
+                <h2 class="fw-bold text-main">
+                    <i class="fas fa-file-alt me-2"></i>File Management
+                </h2>
                 <p class="text-muted mb-0">Manage your uploaded files here.</p>
             </div>
             <div>
-                <a href="{{ route('files.trash') }}" class="btn btn-secondary me-2">
-                    <i class="fa fa-trash"></i> Trash
+                <a href="{{ route('files.trash') }}" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-trash me-2"></i>Trash
                 </a>
                 <button class="btn btn-main" data-bs-toggle="modal" data-bs-target="#uploadModal">
-                    <i class="fa fa-upload"></i> Upload File
+                    <i class="fas fa-upload me-2"></i>Upload File
                 </button>
             </div>
         </div>

@@ -4,11 +4,13 @@
     <div class="content">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold text-main">Sign Document</h2>
+                <h2 class="fw-bold text-main">
+                    <i class="fas fa-signature me-2"></i>Sign Document
+                </h2>
                 <p class="text-muted mb-0">Sign the file: {{ $file->original_name }}</p>
             </div>
-            <a href="{{ route('files.index') }}" class="btn btn-secondary">
-                <i class="fa fa-arrow-left"></i> Back to Files
+            <a href="{{ route('files.index') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Files
             </a>
         </div>
 

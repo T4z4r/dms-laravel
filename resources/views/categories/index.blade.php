@@ -5,11 +5,13 @@
         <!-- Hero Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold text-main">File Categories</h2>
+                <h2 class="fw-bold text-main">
+                    <i class="fas fa-tags me-2"></i>File Categories
+                </h2>
                 <p class="text-muted mb-0">Manage file categories here.</p>
             </div>
             <a href="{{ route('categories.create') }}" class="btn btn-main">
-                <i class="fa fa-plus"></i> Add Category
+                <i class="fas fa-plus me-2"></i>Add Category
             </a>
         </div>
 

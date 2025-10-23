@@ -4,27 +4,31 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-            <div class="sidebar-sticky">
+        <nav class="col-md-2 d-none d-md-block bg-white shadow-sm sidebar" style="min-height: 100vh;">
+            <div class="sidebar-sticky pt-3">
+                <div class="text-center mb-4">
+                    <h5 class="text-main fw-bold">DMS</h5>
+                    <small class="text-muted">Document Management</small>
+                </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">
-                            <i class="fa fa-home"></i> Dashboard
+                        <a class="nav-link {{ request()->routeIs('home') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('home') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('files.*') ? 'active' : '' }}" href="{{ route('files.index') }}">
-                            <i class="fa fa-file"></i> Files
+                        <a class="nav-link {{ request()->routeIs('files.*') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('files.index') }}">
+                            <i class="fas fa-file-alt me-2"></i> Files
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('departments.*') ? 'active' : '' }}" href="{{ route('departments.index') }}">
-                            <i class="fa fa-building"></i> Departments
+                        <a class="nav-link {{ request()->routeIs('departments.*') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('departments.index') }}">
+                            <i class="fas fa-building me-2"></i> Departments
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
-                            <i class="fa fa-tags"></i> Categories
+                        <a class="nav-link {{ request()->routeIs('categories.*') ? 'active bg-primary text-white' : 'text-dark' }} d-flex align-items-center" href="{{ route('categories.index') }}">
+                            <i class="fas fa-tags me-2"></i> Categories
                         </a>
                     </li>
                 </ul>
@@ -32,7 +36,7 @@
         </nav>
 
         <!-- Main content -->
-        <main class="col-md-10 ml-sm-auto px-md-4">
+        <main class="col-md-10 px-md-4 p-2">
             @yield('content')
         </main>
     </div>
