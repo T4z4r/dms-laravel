@@ -52,13 +52,20 @@ class FileController extends Controller
     {
         $request->validate([
             'file'=>'required|file|max:51200', // 50MB
+            'custom_name'=>'nullable|string|max:255',
             'category_id'=>'nullable|exists:file_categories,id',
             'department_id'=>'nullable|exists:departments,id',
         ]);
 
         $uploaded = $request->file('file');
         $origName = $uploaded->getClientOriginalName();
-        $name = pathinfo($origName, PATHINFO_FILENAME) . '_' . Str::random(6) . '.' . $uploaded->getClientOriginalExtension();
+
+        // Use custom name if provided, otherwise use original name
+        $displayName = $request->filled('custom_name') ? $request->custom_name : $origName;
+
+        // Generate unique filename for storage
+        $extension = $uploaded->getClientOriginalExtension();
+        $name = pathinfo($displayName, PATHINFO_FILENAME) . '_' . Str::random(6) . '.' . $extension;
         $path = $uploaded->storeAs('uploads', $name, 'public');
 
         $file = File::create([
@@ -80,6 +87,36 @@ class FileController extends Controller
         $full = storage_path('app/public/'.$file->path);
         if(!file_exists($full)) abort(404,'File not found');
         return response()->file($full);
+    }
+
+    public function details(File $file)
+    {
+        $this->authorize('view', $file);
+
+        try {
+            return response()->json([
+                'success' => true,
+                'file' => [
+                    'id' => $file->id,
+                    'original_name' => $file->original_name,
+                    'size' => $file->getSize(),
+                    'extension' => $file->getExtension(),
+                    'icon' => $file->getIcon(),
+                    'category' => $file->category ? $file->category->name : null,
+                    'department' => $file->department ? $file->department->name : null,
+                    'uploader' => $file->uploader ? $file->uploader->name : 'System',
+                    'upload_date' => $file->created_at->format('M d, Y H:i'),
+                    'modified_date' => $file->updated_at->format('M d, Y H:i'),
+                    'description' => $file->mime_type . ' file',
+                    'path' => $file->path,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading file details: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function download(File $file)
