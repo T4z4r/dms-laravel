@@ -7,6 +7,7 @@
         <nav class="col-md-2 d-none d-md-block sidebar" style="min-height: 100vh;">
             <div class="sidebar-sticky pt-3">
                 <div class="text-center mb-4">
+                    <i class="fas fa-file-alt fa-3x text-primary mb-2"></i>
                     <h5 class="fw-bold">DMS</h5>
                     <small>Document Management</small>
                 </div>
