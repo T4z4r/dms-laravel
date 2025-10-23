@@ -11,50 +11,50 @@
         <!-- Stats Cards -->
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <i class="fas fa-file-alt fa-2x text-primary"></i>
+                            <i class="fas fa-file-alt fa-2x"></i>
                         </div>
                         <h5 class="card-title">Total Files</h5>
-                        <h3 class="text-main">{{ App\Models\File::count() }}</h3>
-                        <small class="text-muted">Files uploaded</small>
+                        <h3>{{ App\Models\File::count() }}</h3>
+                        <small>Files uploaded</small>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <i class="fas fa-building fa-2x text-success"></i>
+                            <i class="fas fa-building fa-2x"></i>
                         </div>
                         <h5 class="card-title">Departments</h5>
-                        <h3 class="text-main">{{ App\Models\Department::count() }}</h3>
-                        <small class="text-muted">Active departments</small>
+                        <h3>{{ App\Models\Department::count() }}</h3>
+                        <small>Active departments</small>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <i class="fas fa-tags fa-2x text-info"></i>
+                            <i class="fas fa-tags fa-2x"></i>
                         </div>
                         <h5 class="card-title">Categories</h5>
-                        <h3 class="text-main">{{ App\Models\FileCategory::count() }}</h3>
-                        <small class="text-muted">File categories</small>
+                        <h3>{{ App\Models\FileCategory::count() }}</h3>
+                        <small>File categories</small>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card stats-card h-100">
                     <div class="card-body text-center">
                         <div class="mb-3">
-                            <i class="fas fa-signature fa-2x text-warning"></i>
+                            <i class="fas fa-signature fa-2x"></i>
                         </div>
                         <h5 class="card-title">Signed Documents</h5>
-                        <h3 class="text-main">{{ App\Models\Signature::count() }}</h3>
-                        <small class="text-muted">Documents signed</small>
+                        <h3>{{ App\Models\Signature::count() }}</h3>
+                        <small>Documents signed</small>
                     </div>
                 </div>
             </div>
@@ -63,13 +63,13 @@
         <!-- Quick Actions -->
         <div class="row mb-4">
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">
                             <i class="fas fa-bolt me-2 text-primary"></i>Quick Actions
                         </h5>
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ route('files.index') }}" class="btn btn-primary">
+                            <a href="{{ route('files.index') }}" class="btn btn-primary btn-main">
                                 <i class="fas fa-file-alt me-2"></i>Manage Files
                             </a>
                             <a href="{{ route('departments.index') }}" class="btn btn-success">
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">
                             <i class="fas fa-chart-bar me-2 text-primary"></i>Recent Activity
@@ -94,6 +94,46 @@
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm card-hover">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-bar me-2 text-primary"></i>Files per Department
+                        </h5>
+                        <canvas id="departmentChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm card-hover">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-line-chart me-2 text-primary"></i>File Upload Trends
+                        </h5>
+                        <canvas id="trendChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm card-hover">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-pie-chart me-2 text-primary"></i>Files per Category
+                        </h5>
+                        <canvas id="categoryChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Additional chart or content can go here -->
             </div>
         </div>
 
@@ -151,4 +191,97 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Files per Department - Bar Chart
+        const departmentCtx = document.getElementById('departmentChart').getContext('2d');
+        const departmentData = @json($filesPerDepartment);
+        const departmentLabels = departmentData.map(item => item.department);
+        const departmentCounts = departmentData.map(item => item.count);
+
+        new Chart(departmentCtx, {
+            type: 'bar',
+            data: {
+                labels: departmentLabels,
+                datasets: [{
+                    label: 'Files',
+                    data: departmentCounts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // File Upload Trends - Line Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const trendData = @json($filesOverTime);
+        const trendLabels = trendData.map(item => item.month);
+        const trendCounts = trendData.map(item => item.count);
+
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: 'Uploads',
+                    data: trendCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Files per Category - Pie Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryData = @json($filesPerCategory);
+        const categoryLabels = categoryData.map(item => item.category);
+        const categoryCounts = categoryData.map(item => item.count);
+
+        new Chart(categoryCtx, {
+            type: 'pie',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 205, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
 @endsection

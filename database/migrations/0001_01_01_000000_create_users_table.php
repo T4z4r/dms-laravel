@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
+            $table->unsignedBigInteger('department_id')->nullable();
             $table->string('position')->nullable();
             $table->string('phone')->nullable();
             $table->boolean('status')->default(true);

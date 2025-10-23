@@ -6,3 +6,126 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+// Custom Professional Styles
+
+// Sidebar Styling
+.sidebar {
+    background-color: $sidebar-bg;
+    color: $sidebar-color;
+    box-shadow: $card-shadow;
+}
+
+.sidebar .nav-link {
+    color: $sidebar-color;
+    padding: 0.75rem 1rem;
+    border-radius: $border-radius;
+    margin-bottom: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.sidebar .nav-link.active {
+    background-color: $primary;
+    color: white;
+}
+
+// Main Content
+main {
+    background-color: $body-bg;
+    min-height: 100vh;
+}
+
+// Cards
+.card {
+    border: none;
+    border-radius: $border-radius;
+    box-shadow: $card-shadow;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+// Buttons
+.btn {
+    border-radius: $border-radius;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: $primary;
+    border-color: $primary;
+}
+
+.btn-primary:hover {
+    background-color: darken($primary, 10%);
+    border-color: darken($primary, 10%);
+}
+
+// Stats Cards
+.stats-card {
+    background: linear-gradient(135deg, $primary 0%, lighten($primary, 10%) 100%);
+    color: white;
+    border-radius: $border-radius;
+    box-shadow: $card-shadow;
+}
+
+.stats-card .card-title {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stats-card h3 {
+    color: white;
+}
+
+// Table Styling
+.table {
+    border-radius: $border-radius;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: $light;
+    border-bottom: 2px solid $primary;
+    font-weight: 600;
+    color: $dark;
+}
+
+.table tbody tr:hover {
+    background-color: rgba($primary, 0.05);
+}
+
+// Navbar
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+// Responsive Adjustments
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 250px;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    main {
+        margin-left: 0;
+    }
+}

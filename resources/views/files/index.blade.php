@@ -5,7 +5,7 @@
         <!-- Hero Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold text-main mb-1">
+                <h2 class="fw-bold mb-1">
                     <i class="fas fa-file-alt me-2"></i>File Management System
                 </h2>
                 <p class="text-muted mb-0">Organize, manage, and access your documents efficiently</p>
@@ -14,7 +14,7 @@
                 <a href="{{ route('files.trash') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-trash me-2"></i>Trash ({{ $files->total() }})
                 </a>
-                <button class="btn btn-main" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
                     <i class="fas fa-upload me-2"></i>Upload File
                 </button>
             </div>
@@ -23,7 +23,7 @@
         <!-- Stats Cards -->
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card stats-card">
                     <div class="card-body text-center">
                         <i class="fas fa-file-alt fa-2x mb-2"></i>
                         <h4 class="mb-1">{{ $files->total() }}</h4>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm bg-success text-white">
+                <div class="card stats-card">
                     <div class="card-body text-center">
                         <i class="fas fa-folder fa-2x mb-2"></i>
                         <h4 class="mb-1">{{ $categories->count() }}</h4>
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm bg-info text-white">
+                <div class="card stats-card">
                     <div class="card-body text-center">
                         <i class="fas fa-building fa-2x mb-2"></i>
                         <h4 class="mb-1">{{ $departments->count() }}</h4>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card border-0 shadow-sm bg-warning text-white">
+                <div class="card stats-card">
                     <div class="card-body text-center">
                         <i class="fas fa-clock fa-2x mb-2"></i>
                         <h4 class="mb-1">{{ $files->where('created_at', '>=', now()->subDays(7))->count() }}</h4>
@@ -61,10 +61,10 @@
         </div>
 
         <!-- File Table -->
-        <div class="card border-0 shadow-sm">
+        <div class="card">
             <div class="card-header bg-white border-bottom">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 text-main">
+                    <h5 class="mb-0">
                         <i class="fas fa-list me-2"></i>Files
                     </h5>
                     <div class="d-flex gap-2">
@@ -208,9 +208,9 @@
         <div class="modal-dialog">
             <form action="{{ route('files.store') }}" method="POST" enctype="multipart/form-data" class="modal-content">
                 @csrf
-                <div class="modal-header bg-main text-white">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Upload File</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -245,7 +245,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-main">Upload</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
                 </div>
             </form>
         </div>
@@ -407,51 +407,4 @@
         @endif
     </script>
 
-    <style>
-        .table th {
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .table td {
-            vertical-align: middle;
-        }
-
-        .btn-group .btn {
-            border-radius: 0.375rem !important;
-            margin: 0 1px;
-        }
-
-        .btn-group .btn:first-child {
-            margin-left: 0;
-        }
-
-        .btn-group .btn:last-child {
-            margin-right: 0;
-        }
-
-        .card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-        }
-
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.375rem 0.75rem;
-        }
-
-        .modal-header {
-            border-bottom: none;
-        }
-
-        .modal-footer {
-            border-top: none;
-        }
-    </style>
 @endsection

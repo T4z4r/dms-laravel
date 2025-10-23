@@ -6,8 +6,8 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-3">Document Management System</h1>
-                <p class="lead mb-4">Streamline your document workflow with our powerful, secure, and user-friendly DMS. Manage files, departments, and categories effortlessly.</p>
+                <h1 class="display-4 fw-bold mb-3 text-primary">Document Management System</h1>
+                <p class="lead mb-4 text-muted">Streamline your document workflow with our powerful, secure, and user-friendly DMS. Manage files, departments, and categories effortlessly.</p>
                 <div class="d-flex gap-2">
                     @auth
                         <a href="{{ route('home') }}" class="btn btn-light btn-lg">
@@ -35,7 +35,7 @@
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-12">
-                <h2 class="display-5 fw-bold text-main">Why Choose Our DMS?</h2>
+                <h2 class="display-5 fw-bold">Why Choose Our DMS?</h2>
                 <p class="lead text-muted">Discover the features that make our Document Management System stand out.</p>
             </div>
         </div>
@@ -62,7 +62,7 @@
                         </div>
                         <h5 class="card-title">Department Organization</h5>
                         <p class="card-text">Organize your team into departments for better collaboration and access management.</p>
-                        <a href="{{ route('departments.index') }}" class="btn btn-success">
+                        <a href="{{ route('departments.index') }}" class="btn btn-success text-light">
                             <i class="fas fa-arrow-right me-2"></i>Manage Departments
                         </a>
                     </div>
@@ -76,7 +76,7 @@
                         </div>
                         <h5 class="card-title">Smart Categorization</h5>
                         <p class="card-text">Categorize files for easy access and improved search functionality.</p>
-                        <a href="{{ route('categories.index') }}" class="btn btn-info">
+                        <a href="{{ route('categories.index') }}" class="btn btn-info text-light">
                             <i class="fas fa-arrow-right me-2"></i>Manage Categories
                         </a>
                     </div>
@@ -94,28 +94,28 @@
                 <div class="mb-3">
                     <i class="fas fa-file fa-2x text-primary"></i>
                 </div>
-                <h3 class="text-main">{{ App\Models\File::count() }}</h3>
+                <h3>{{ App\Models\File::count() }}</h3>
                 <p class="text-muted">Total Files</p>
             </div>
             <div class="col-md-3">
                 <div class="mb-3">
                     <i class="fas fa-building fa-2x text-success"></i>
                 </div>
-                <h3 class="text-main">{{ App\Models\Department::count() }}</h3>
+                <h3>{{ App\Models\Department::count() }}</h3>
                 <p class="text-muted">Departments</p>
             </div>
             <div class="col-md-3">
                 <div class="mb-3">
                     <i class="fas fa-tags fa-2x text-info"></i>
                 </div>
-                <h3 class="text-main">{{ App\Models\FileCategory::count() }}</h3>
+                <h3>{{ App\Models\FileCategory::count() }}</h3>
                 <p class="text-muted">Categories</p>
             </div>
             <div class="col-md-3">
                 <div class="mb-3">
                     <i class="fas fa-signature fa-2x text-warning"></i>
                 </div>
-                <h3 class="text-main">{{ App\Models\Signature::count() }}</h3>
+                <h3>{{ App\Models\Signature::count() }}</h3>
                 <p class="text-muted">Signed Documents</p>
             </div>
         </div>
@@ -128,7 +128,7 @@
         <h2 class="display-5 fw-bold mb-3">Ready to Get Started?</h2>
         <p class="lead mb-4">Join thousands of users who trust our DMS for their document management needs.</p>
         @auth
-            <a href="{{ route('home') }}" class="btn btn-main btn-lg">
+            <a href="{{ route('home') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-rocket me-2"></i>Launch Dashboard
             </a>
         @else
