@@ -169,7 +169,7 @@
                                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal" onclick="viewFile({{ $file->id }})" title="View File">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <a href="{{ route('files.download', $file) }}" class="btn btn-sm btn-outline-success" title="Download">
+                                            <a href="{{ route('files.download', $file) }}" class="btn btn-sm btn-outline-success mx-1" title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
                                             <button class="btn btn-sm btn-outline-danger" onclick="deleteFile({{ $file->id }}, '{{ $file->original_name }}')" title="Delete">
