@@ -72,10 +72,10 @@
                             <a href="{{ route('files.index') }}" class="btn btn-primary btn-main">
                                 <i class="fas fa-file-alt me-2"></i>Manage Files
                             </a>
-                            <a href="{{ route('departments.index') }}" class="btn btn-success">
+                            <a href="{{ route('departments.index') }}" class="btn btn-success text-light">
                                 <i class="fas fa-building me-2"></i>Departments
                             </a>
-                            <a href="{{ route('categories.index') }}" class="btn btn-info">
+                            <a href="{{ route('categories.index') }}" class="btn btn-info text-light">
                                 <i class="fas fa-tags me-2"></i>Categories
                             </a>
                         </div>

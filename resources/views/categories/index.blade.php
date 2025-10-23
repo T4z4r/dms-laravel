@@ -10,9 +10,9 @@
                 </h2>
                 <p class="text-muted mb-0">Manage file categories here.</p>
             </div>
-            <a href="{{ route('categories.create') }}" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
                 <i class="fas fa-plus me-2"></i>Add Category
-            </a>
+            </button>
         </div>
 
         <!-- Categories Table -->
@@ -39,9 +39,9 @@
                                     <a href="{{ route('categories.show', $category) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="fa fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-outline-warning">
+                                    <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-id="{{ $category->id }}" data-name="{{ $category->name }}">
                                         <i class="fa fa-edit"></i>
-                                    </a>
+                                    </button>
                                     <form action="{{ route('categories.destroy', $category) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -58,6 +58,56 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Category Modal -->
+    <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCategoryModalLabel">Create Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('categories.store') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="create_name" class="form-label">Category Name</label>
+                            <input type="text" name="name" id="create_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Category Modal -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editCategoryForm" method="POST">
+                    @csrf @method('PUT')
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit_category_name" class="form-label">Category Name</label>
+                            <input type="text" name="name" id="edit_category_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Category</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
