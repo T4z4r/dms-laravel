@@ -3,7 +3,9 @@
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FileCategoryController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -39,4 +41,12 @@ Route::middleware(['auth'])->group(function () {
     // resources for departments and categories
     Route::resource('departments', DepartmentController::class);
     Route::resource('categories', FileCategoryController::class);
+
+    // User management
+    Route::resource('users', UserController::class);
+
+    // Profile management
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
 });

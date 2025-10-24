@@ -64,6 +64,10 @@
                                  <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}"
                                      href="{{ route('categories.index') }}">Categories</a>
                              </li>
+                             <li class="nav-item">
+                                 <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}"
+                                     href="{{ route('users.index') }}">Users</a>
+                             </li>
                          @endauth
                      </ul>
 
@@ -90,6 +94,12 @@
                                  </a>
 
                                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                     <li>
+                                         <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                                             {{ __('Profile') }}
+                                         </a>
+                                     </li>
+                                     <li><hr class="dropdown-divider"></li>
                                      <li>
                                          <a class="dropdown-item" href="#"
                                              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

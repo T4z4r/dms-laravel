@@ -109,6 +109,8 @@ class FileController extends Controller
                     'modified_date' => $file->updated_at->format('M d, Y H:i'),
                     'description' => $file->mime_type . ' file',
                     'path' => $file->path,
+                    'is_signed' => $file->is_signed,
+                    'can_sign' => auth()->user()->can('sign', $file),
                 ]
             ]);
         } catch (\Exception $e) {

@@ -169,6 +169,11 @@
                                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal" onclick="viewFile({{ $file->id }})" title="View File">
                                                 <i class="fas fa-eye"></i>
                                             </button>
+                                            @if($file->is_signed)
+                                                <a href="{{ route('files.signature.view', $file) }}" class="btn btn-sm btn-outline-warning mx-1" title="View Signature">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            @endif
                                             <a href="{{ route('files.download', $file) }}" class="btn btn-sm btn-outline-success mx-1" title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
@@ -274,7 +279,65 @@
                     <a href="#" id="downloadBtn" class="btn btn-success" download>
                         <i class="fas fa-download me-2"></i>Download
                     </a>
+                    <a href="#" id="signBtn" class="btn btn-info" style="display: none;" data-bs-toggle="modal" data-bs-target="#signModal">
+                        <i class="fas fa-signature me-2"></i>Sign Document
+                    </a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div class="modal fade" id="signModal" tabindex="-1" aria-labelledby="signModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="signModalLabel">
+                        <i class="fas fa-signature me-2"></i>Sign Document
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="signForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Signature Type</label>
+                            <select name="signature_type" id="signature_type_modal" class="form-select" required>
+                                <option value="drawn">Drawn Signature</option>
+                                <option value="typed">Typed Signature</option>
+                                <option value="uploaded">Uploaded Image</option>
+                            </select>
+                        </div>
+
+                        <div id="drawn_signature_modal" class="mb-3" style="display: none;">
+                            <label class="form-label">Draw Your Signature</label>
+                            <canvas id="signatureCanvasModal" width="400" height="200" style="border: 1px solid #ccc;"></canvas>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearCanvasModal()">Clear</button>
+                            </div>
+                            <input type="hidden" name="signature_image" id="signature_image_drawn_modal">
+                        </div>
+
+                        <div id="typed_signature_modal" class="mb-3" style="display: none;">
+                            <label class="form-label">Type Your Signature</label>
+                            <textarea name="signature_image" class="form-control" rows="5" placeholder="Enter your typed signature here"></textarea>
+                        </div>
+
+                        <div id="uploaded_signature_modal" class="mb-3" style="display: none;">
+                            <label class="form-label">Upload Signature Image</label>
+                            <input type="file" name="signature_image" class="form-control" accept="image/*">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="signSubmitBtn">Sign Document</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -305,7 +368,20 @@
                     if (data.success) {
                         const file = data.file;
                         const downloadBtn = document.getElementById('downloadBtn');
+                        const signBtn = document.getElementById('signBtn');
                         downloadBtn.href = `/files/${fileId}/download`;
+
+                        if (file.can_sign && !file.is_signed) {
+                            signBtn.style.display = 'inline-block';
+                            signBtn.onclick = function() {
+                                document.getElementById('signForm').action = `/files/${fileId}/sign`;
+                                updateSignatureFieldsModal();
+                                const signModal = new bootstrap.Modal(document.getElementById('signModal'));
+                                signModal.show();
+                            };
+                        } else {
+                            signBtn.style.display = 'none';
+                        }
 
                         modalBody.innerHTML = `
                             <div class="row">
@@ -317,6 +393,7 @@
                                         <div>
                                             <h5 class="mb-1">${file.original_name}</h5>
                                             <p class="text-muted mb-0">${file.description || 'No description available'}</p>
+                                            ${file.is_signed ? '<span class="badge bg-success">Signed</span>' : '<span class="badge bg-warning">Not Signed</span>'}
                                         </div>
                                     </div>
 
@@ -415,6 +492,140 @@
                 location.reload();
             }, 2000);
         @endif
+
+        // Signature modal functions
+        const signatureTypeModal = document.getElementById('signature_type_modal');
+        const drawnSignatureModal = document.getElementById('drawn_signature_modal');
+        const typedSignatureModal = document.getElementById('typed_signature_modal');
+        const uploadedSignatureModal = document.getElementById('uploaded_signature_modal');
+
+        function updateSignatureFieldsModal() {
+            drawnSignatureModal.style.display = 'none';
+            typedSignatureModal.style.display = 'none';
+            uploadedSignatureModal.style.display = 'none';
+
+            const type = signatureTypeModal.value;
+            if (type === 'drawn') {
+                drawnSignatureModal.style.display = 'block';
+                initCanvasModal();
+            } else if (type === 'typed') {
+                typedSignatureModal.style.display = 'block';
+            } else if (type === 'uploaded') {
+                uploadedSignatureModal.style.display = 'block';
+            }
+        }
+
+        signatureTypeModal.addEventListener('change', updateSignatureFieldsModal);
+
+        let canvasModal, ctxModal, isDrawingModal = false;
+
+        function initCanvasModal() {
+            canvasModal = document.getElementById('signatureCanvasModal');
+            ctxModal = canvasModal.getContext('2d');
+            ctxModal.strokeStyle = '#000';
+            ctxModal.lineWidth = 2;
+            ctxModal.lineCap = 'round';
+
+            canvasModal.addEventListener('mousedown', startDrawingModal);
+            canvasModal.addEventListener('mousemove', drawModal);
+            canvasModal.addEventListener('mouseup', stopDrawingModal);
+            canvasModal.addEventListener('mouseout', stopDrawingModal);
+
+            // Touch events for mobile
+            canvasModal.addEventListener('touchstart', startDrawingTouchModal);
+            canvasModal.addEventListener('touchmove', drawTouchModal);
+            canvasModal.addEventListener('touchend', stopDrawingModal);
+        }
+
+        function startDrawingModal(e) {
+            isDrawingModal = true;
+            ctxModal.beginPath();
+            ctxModal.moveTo(e.offsetX, e.offsetY);
+        }
+
+        function drawModal(e) {
+            if (!isDrawingModal) return;
+            ctxModal.lineTo(e.offsetX, e.offsetY);
+            ctxModal.stroke();
+        }
+
+        function stopDrawingModal() {
+            isDrawingModal = false;
+            updateSignatureImageModal();
+        }
+
+        function startDrawingTouchModal(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvasModal.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            isDrawingModal = true;
+            ctxModal.beginPath();
+            ctxModal.moveTo(x, y);
+        }
+
+        function drawTouchModal(e) {
+            e.preventDefault();
+            if (!isDrawingModal) return;
+            const touch = e.touches[0];
+            const rect = canvasModal.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            ctxModal.lineTo(x, y);
+            ctxModal.stroke();
+        }
+
+        function clearCanvasModal() {
+            ctxModal.clearRect(0, 0, canvasModal.width, canvasModal.height);
+            document.getElementById('signature_image_drawn_modal').value = '';
+        }
+
+        function updateSignatureImageModal() {
+            const dataURL = canvasModal.toDataURL();
+            document.getElementById('signature_image_drawn_modal').value = dataURL;
+        }
+
+        // Handle form submission
+        document.getElementById('signForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('signSubmitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Signing...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(this);
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Close modal and refresh page
+                    const signModal = bootstrap.Modal.getInstance(document.getElementById('signModal'));
+                    signModal.hide();
+                    location.reload();
+                } else {
+                    alert('Error signing document: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error signing document. Please try again.');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
     </script>
 
 @endsection
