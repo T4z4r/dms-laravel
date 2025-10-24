@@ -1,130 +1,154 @@
  <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+ <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+ <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>DMS - Document Management System</title>
+     <!-- CSRF Token -->
+     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+     <title>DMS - Document Management System</title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <!-- Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css">
+     <!-- Font Awesome -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+     <!-- SweetAlert2 CSS -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.min.css">
 
-    <!-- Custom CSS -->
-    @vite('resources/sass/app.scss')
-</head>
-<body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
-                    <i class="fas fa-file-alt fa-2x text-primary me-2"></i>
-                    <span class="fw-bold">DMS</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+     <!-- Fonts -->
+     <link rel="dns-prefetch" href="//fonts.bunny.net">
+     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        @auth
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Dashboard</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('files.*') ? 'active' : '' }}" href="{{ route('files.index') }}">Files</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('departments.*') ? 'active' : '' }}" href="{{ route('departments.index') }}">Departments</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">Categories</a>
-                            </li>
-                        @endauth
-                    </ul>
+     <!-- Custom CSS -->
+     @vite('resources/sass/app.scss')
+ </head>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
+ <body>
+     <div id="app">
+         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+             <div class="container">
+                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
+                     <i class="fas fa-file-alt fa-2x text-primary me-2"></i>
+                     <span class="fw-bold">DMS</span>
+                 </a>
+                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                     <span class="navbar-toggler-icon"></span>
+                 </button>
 
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
+                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                     <!-- Left Side Of Navbar -->
+                     <ul class="navbar-nav me-auto">
+                         @auth
+                             <li class="nav-item">
+                                 <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}"
+                                     href="{{ route('home') }}">Dashboard</a>
+                             </li>
+                             <li class="nav-item">
+                                 <a class="nav-link {{ request()->routeIs('files.*') ? 'active' : '' }}"
+                                     href="{{ route('files.index') }}">Files</a>
+                             </li>
+                             <li class="nav-item">
+                                 <a class="nav-link {{ request()->routeIs('departments.*') ? 'active' : '' }}"
+                                     href="{{ route('departments.index') }}">Departments</a>
+                             </li>
+                             <li class="nav-item">
+                                 <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}"
+                                     href="{{ route('categories.index') }}">Categories</a>
+                             </li>
+                         @endauth
+                     </ul>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault(); confirmLogout();">
-                                         {{ __('Logout') }}
-                                     </a>
+                     <!-- Right Side Of Navbar -->
+                     <ul class="navbar-nav ms-auto">
+                         <!-- Authentication Links -->
+                         @guest
+                             @if (Route::has('login'))
+                                 <li class="nav-item">
+                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                 </li>
+                             @endif
 
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
-                </div>
-            </div>
-        </nav>
+                             @if (Route::has('register'))
+                                 <li class="nav-item">
+                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                 </li>
+                             @endif
+                         @else
+                             <li class="nav-item dropdown">
+                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                     {{ Auth::user()->name }}
+                                 </a>
 
-        <main class="p-4">
-            @yield('content')
-        </main>
-    </div>
+                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                     <li>
+                                         <a class="dropdown-item" href="#"
+                                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                             {{ __('Logout') }}
+                                         </a>
+                                     </li>
+                                 </ul>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                     @csrf
+                                 </form>
+                             </li>
 
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"></script>
+                         @endguest
+                     </ul>
+                 </div>
+             </div>
+         </nav>
 
-    <!-- Custom JS -->
-    @vite('resources/js/app.js')
+         <main class="p-4">
+             @yield('content')
+         </main>
+     </div>
 
-    <script>
-        function confirmLogout() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'You want to logout?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('logout-form').submit();
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+     <!-- Bootstrap JS -->
+     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+     <!-- SweetAlert2 JS -->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js"></script>
+
+     <!-- Custom JS -->
+     {{-- @vite('resources/js/app.js') --}}
+
+     <script>
+         function confirmLogout() {
+             Swal.fire({
+                 title: 'Are you sure?',
+                 text: 'You want to logout?',
+                 icon: 'question',
+                 showCancelButton: true,
+                 confirmButtonColor: '#3085d6',
+                 cancelButtonColor: '#d33',
+                 confirmButtonText: 'Yes, logout!'
+             }).then((result) => {
+                 if (result.isConfirmed) {
+                     document.getElementById('logout-form').submit();
+                 }
+             });
+         }
+
+         Add event listener for logout link
+         document.addEventListener('DOMContentLoaded', function() {
+             const logoutLink = document.querySelector('.logout-link');
+             if (logoutLink) {
+                 logoutLink.addEventListener('click', function(event) {
+                     event.preventDefault();
+                     confirmLogout();
+                 });
+             }
+         });
+     </script>
+ </body>
+
+ </html>
