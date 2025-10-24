@@ -105,7 +105,7 @@
                         <h5 class="card-title">
                             <i class="fas fa-chart-bar me-2 text-primary"></i>Files per Department
                         </h5>
-                        <canvas id="departmentChart" width="400" height="200"></canvas>
+                        <div id="departmentChart" style="width:100%; height:200px;"></div>
                     </div>
                 </div>
             </div>
@@ -115,7 +115,7 @@
                         <h5 class="card-title">
                             <i class="fas fa-line-chart me-2 text-primary"></i>File Upload Trends
                         </h5>
-                        <canvas id="trendChart" width="400" height="200"></canvas>
+                        <div id="trendChart" style="width:100%; height:200px;"></div>
                     </div>
                 </div>
             </div>
@@ -128,7 +128,7 @@
                         <h5 class="card-title">
                             <i class="fas fa-pie-chart me-2 text-primary"></i>Files per Category
                         </h5>
-                        <canvas id="categoryChart" width="400" height="200"></canvas>
+                        <div id="categoryChart" style="width:100%; height:200px;"></div>
                     </div>
                 </div>
             </div>
@@ -194,94 +194,43 @@
 
     <script>
         // Files per Department - Bar Chart
-        const departmentCtx = document.getElementById('departmentChart').getContext('2d');
         const departmentData = @json($filesPerDepartment);
         const departmentLabels = departmentData.map(item => item.department);
         const departmentCounts = departmentData.map(item => item.count);
 
-        new Chart(departmentCtx, {
-            type: 'bar',
-            data: {
-                labels: departmentLabels,
-                datasets: [{
-                    label: 'Files',
-                    data: departmentCounts,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+        Highcharts.chart('departmentChart', {
+            chart: { type: 'bar' },
+            title: { text: 'Files per Department' },
+            xAxis: { categories: departmentLabels },
+            yAxis: { title: { text: 'Number of Files' }, min: 0 },
+            series: [{ name: 'Files', data: departmentCounts }]
         });
 
         // File Upload Trends - Line Chart
-        const trendCtx = document.getElementById('trendChart').getContext('2d');
         const trendData = @json($filesOverTime);
         const trendLabels = trendData.map(item => item.month);
         const trendCounts = trendData.map(item => item.count);
 
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: trendLabels,
-                datasets: [{
-                    label: 'Uploads',
-                    data: trendCounts,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 2,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
+        Highcharts.chart('trendChart', {
+            chart: { type: 'line' },
+            title: { text: 'File Upload Trends' },
+            xAxis: { categories: trendLabels },
+            yAxis: { title: { text: 'Uploads' }, min: 0 },
+            series: [{ name: 'Uploads', data: trendCounts }]
         });
 
         // Files per Category - Pie Chart
-        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
         const categoryData = @json($filesPerCategory);
         const categoryLabels = categoryData.map(item => item.category);
         const categoryCounts = categoryData.map(item => item.count);
 
-        new Chart(categoryCtx, {
-            type: 'pie',
-            data: {
-                labels: categoryLabels,
-                datasets: [{
-                    data: categoryCounts,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.5)',
-                        'rgba(54, 162, 235, 0.5)',
-                        'rgba(255, 205, 86, 0.5)',
-                        'rgba(75, 192, 192, 0.5)',
-                        'rgba(153, 102, 255, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 205, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true
-            }
+        Highcharts.chart('categoryChart', {
+            chart: { type: 'pie' },
+            title: { text: 'Files per Category' },
+            series: [{
+                name: 'Files',
+                data: categoryLabels.map((label, index) => ({ name: label, y: categoryCounts[index] }))
+            }]
         });
     </script>
 @endsection

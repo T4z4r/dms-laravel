@@ -25,6 +25,9 @@
 
      <!-- Custom CSS -->
      @vite('resources/sass/app.scss')
+
+     <!-- Highcharts CDN -->
+     <script src="https://code.highcharts.com/highcharts.js"></script>
  </head>
 
  <body>
