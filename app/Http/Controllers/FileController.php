@@ -5,6 +5,7 @@ use App\Models\File;
 use App\Models\FileCategory;
 use App\Models\Department;
 use App\Models\FileShare;
+use App\Models\FileComment;
 use App\Mail\FileShared;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -55,6 +56,7 @@ class FileController extends Controller
             'custom_name'=>'nullable|string|max:255',
             'category_id'=>'nullable|exists:file_categories,id',
             'department_id'=>'nullable|exists:departments,id',
+            'default_access'=>'nullable|in:view,comment,edit,sign',
         ]);
 
         $uploaded = $request->file('file');
@@ -77,6 +79,11 @@ class FileController extends Controller
             'department_id'=>$request->department_id,
             'uploaded_by'=>auth()->id(),
         ]);
+
+        // Store default access level in session for future sharing
+        if($request->filled('default_access')) {
+            session(['default_access_' . $file->id => $request->default_access]);
+        }
 
         return back()->with('success','File uploaded successfully');
     }
@@ -197,5 +204,139 @@ class FileController extends Controller
         $full = storage_path('app/public/'.$file->path);
         if(!file_exists($full)) abort(404);
         return response()->file($full);
+    }
+
+    // edit file metadata
+    public function edit(File $file)
+    {
+        $this->authorize('edit', $file);
+        $categories = FileCategory::all();
+        $departments = Department::all();
+        return view('files.edit', compact('file', 'categories', 'departments'));
+    }
+
+    // update file metadata
+    public function update(Request $request, File $file)
+    {
+        $this->authorize('edit', $file);
+
+        $request->validate([
+            'custom_name'=>'nullable|string|max:255',
+            'category_id'=>'nullable|exists:file_categories,id',
+            'department_id'=>'nullable|exists:departments,id',
+        ]);
+
+        $file->update([
+            'name' => $request->filled('custom_name') ? $request->custom_name : $file->name,
+            'category_id' => $request->category_id,
+            'department_id' => $request->department_id,
+        ]);
+
+        return redirect()->route('files.index')->with('success', 'File updated successfully');
+    }
+
+    // add comment to file
+    public function comment(Request $request, File $file)
+    {
+        $this->authorize('comment', $file);
+
+        $request->validate([
+            'comment' => 'required|string|max:1000'
+        ]);
+
+        FileComment::create([
+            'file_id' => $file->id,
+            'user_id' => auth()->id(),
+            'comment' => $request->comment
+        ]);
+
+        return back()->with('success', 'Comment added successfully');
+    }
+
+    // get comments for file (AJAX)
+    public function getComments(File $file)
+    {
+        $this->authorize('view', $file);
+        $comments = $file->comments()->with('user')->get();
+
+        return response()->json([
+            'success' => true,
+            'comments' => $comments->map(function($comment) {
+                return [
+                    'id' => $comment->id,
+                    'comment' => $comment->comment,
+                    'user_name' => $comment->user->name,
+                    'created_at' => $comment->created_at->format('M d, Y H:i'),
+                ];
+            })
+        ]);
+    }
+
+    // get shares for file (AJAX)
+    public function getShares(File $file)
+    {
+        $this->authorize('share', $file);
+        $shares = $file->shares()->with('sharedBy')->get();
+
+        return response()->json([
+            'success' => true,
+            'shares' => $shares->map(function($share) {
+                return [
+                    'id' => $share->id,
+                    'email' => $share->email,
+                    'access' => $share->access,
+                    'created_at' => $share->created_at->diffForHumans(),
+                ];
+            })
+        ]);
+    }
+
+    // generate shareable link
+    public function generateShareableLink(File $file)
+    {
+        $this->authorize('share', $file);
+
+        // Generate or get existing token
+        $token = $file->share_token ?: Str::random(40);
+        $file->update(['share_token' => $token]);
+
+        $link = route('files.shared', ['token' => $token]);
+
+        return response()->json([
+            'success' => true,
+            'link' => $link
+        ]);
+    }
+
+    // update share permission
+    public function updateShare(Request $request, $shareId)
+    {
+        $request->validate([
+            'access' => 'required|in:view,comment,edit,sign'
+        ]);
+
+        $share = FileShare::findOrFail($shareId);
+        $this->authorize('share', $share->file);
+
+        $share->update(['access' => $request->access]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Share permission updated successfully'
+        ]);
+    }
+
+    // remove share
+    public function removeShare($shareId)
+    {
+        $share = FileShare::findOrFail($shareId);
+        $this->authorize('share', $share->file);
+
+        $share->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Share removed successfully'
+        ]);
     }
 }

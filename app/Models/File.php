@@ -23,6 +23,7 @@ class File extends Model
     public function signedBy(){ return $this->belongsTo(User::class,'signed_by'); }
     public function shares(){ return $this->hasMany(related: FileShare::class); }
     public function signature(){ return $this->hasOne(Signature::class); }
+    public function comments(){ return $this->hasMany(FileComment::class)->with('user')->latest(); }
 
     // Access control: owner OR admin OR same-department OR shared email
     public function isAccessibleBy(User $user)
@@ -33,6 +34,32 @@ class File extends Model
         if($this->department_id && $user->department_id && $this->department_id === $user->department_id) return true;
         if($this->shares()->where('email', $user->email)->whereNotNull('id')->exists()) return true;
         return false;
+    }
+
+    // Check specific access level for shared users
+    public function getUserAccessLevel(User $user)
+    {
+        if(!$user) return null;
+        if($user->hasRole('admin')) return 'admin';
+        if($this->uploaded_by === $user->id) return 'owner';
+        if($this->department_id && $user->department_id && $this->department_id === $user->department_id) return 'department';
+
+        $share = $this->shares()->where('email', $user->email)->first();
+        return $share ? $share->access : null;
+    }
+
+    // Check if user can edit this file
+    public function canUserEdit(User $user)
+    {
+        $access = $this->getUserAccessLevel($user);
+        return in_array($access, ['admin', 'owner', 'edit', 'sign']);
+    }
+
+    // Check if user can comment on this file
+    public function canUserComment(User $user)
+    {
+        $access = $this->getUserAccessLevel($user);
+        return in_array($access, ['admin', 'owner', 'department', 'comment', 'edit', 'sign']);
     }
 
     public function isShareExpired()

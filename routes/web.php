@@ -30,6 +30,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/files/{file}/share', [FileController::class,'share'])->name('files.share');
     Route::get('/shared/{token}', [FileController::class,'shared'])->name('files.shared');
 
+    // edit and comment functionality
+    Route::get('/files/{file}/edit', [FileController::class,'edit'])->name('files.edit');
+    Route::put('/files/{file}/update', [FileController::class,'update'])->name('files.update');
+    Route::post('/files/{file}/comment', [FileController::class,'comment'])->name('files.comment');
+    Route::get('/files/{file}/comments', [FileController::class,'getComments'])->name('files.comments');
+
+    // sharing functionality
+    Route::get('/files/{file}/shares', [FileController::class,'getShares'])->name('files.shares');
+    Route::get('/files/{file}/generate-link', [FileController::class,'generateShareableLink'])->name('files.generate-link');
+    Route::patch('/shares/{share}', [FileController::class,'updateShare'])->name('shares.update');
+    Route::delete('/shares/{share}', [FileController::class,'removeShare'])->name('shares.remove');
+
     Route::post('/files/{id}/restore', [FileController::class,'restore'])->name('files.restore');
     Route::delete('/files/{id}/forceDelete', [FileController::class,'forceDelete'])->name('files.forceDelete');
 

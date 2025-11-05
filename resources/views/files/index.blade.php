@@ -169,6 +169,11 @@
                                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal" onclick="viewFile({{ $file->id }})" title="View File">
                                                 <i class="fas fa-eye"></i>
                                             </button>
+                                            @if($file->canUserEdit(auth()->user()))
+                                                <a href="{{ route('files.edit', $file) }}" class="btn btn-sm btn-outline-info mx-1" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            @endif
                                             @if($file->is_signed)
                                                 <a href="{{ route('files.signature.view', $file) }}" class="btn btn-sm btn-outline-warning mx-1" title="View Signature">
                                                     <i class="fas fa-eye"></i>
@@ -177,6 +182,16 @@
                                             <a href="{{ route('files.download', $file) }}" class="btn btn-sm btn-outline-success mx-1" title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
+                                            @if($file->canUserComment(auth()->user()))
+                                                <button class="btn btn-sm btn-outline-secondary mx-1" data-bs-toggle="modal" data-bs-target="#commentModal" onclick="openCommentModal({{ $file->id }}, '{{ $file->original_name }}')" title="Comment">
+                                                    <i class="fas fa-comment"></i>
+                                                </button>
+                                            @endif
+                                            @can('share', $file)
+                                                <button class="btn btn-sm btn-outline-info mx-1" data-bs-toggle="modal" data-bs-target="#shareModal" onclick="openShareModal({{ $file->id }}, '{{ $file->original_name }}')" title="Share">
+                                                    <i class="fas fa-share"></i>
+                                                </button>
+                                            @endcan
                                             <button class="btn btn-sm btn-outline-danger" onclick="deleteFile({{ $file->id }}, '{{ $file->original_name }}')" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -246,6 +261,16 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="default_access" class="form-label">Default Access Level</label>
+                        <select name="default_access" id="default_access" class="form-select">
+                            <option value="view">View Only</option>
+                            <option value="comment">Comment</option>
+                            <option value="edit">Edit</option>
+                            <option value="sign">Sign</option>
+                        </select>
+                        <div class="form-text">This sets the default access level for users who will be granted access to this file</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -338,6 +363,118 @@
                         <button type="submit" class="btn btn-primary" id="signSubmitBtn">Sign Document</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comment Modal -->
+    <div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="commentForm" method="POST" class="modal-content">
+                @csrf
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="commentModalLabel">
+                        <i class="fas fa-comment me-2"></i>Add Comment
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="comment_text" class="form-label">Comment</label>
+                        <textarea name="comment" id="comment_text" class="form-control" rows="4" placeholder="Enter your comment..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info">Add Comment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="shareModalLabel">
+                        <i class="fas fa-share me-2"></i>Share File
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Share Form -->
+                    <form id="shareForm" method="POST" class="mb-4">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="share_email" class="form-label">Email Address</label>
+                                    <input type="email" name="email" id="share_email" class="form-control" placeholder="Enter email address" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="share_access" class="form-label">Access Level</label>
+                                    <select name="access" id="share_access" class="form-select" required>
+                                        <option value="view">Viewer</option>
+                                        <option value="comment">Commenter</option>
+                                        <option value="edit">Editor</option>
+                                        <option value="sign">Signer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="expires_hours" class="form-label">Expiration (Optional)</label>
+                                    <select name="expires_hours" id="expires_hours" class="form-select">
+                                        <option value="">Never expires</option>
+                                        <option value="24">1 day</option>
+                                        <option value="168">1 week</option>
+                                        <option value="720">1 month</option>
+                                        <option value="8760">1 year</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-share me-2"></i>Share
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Current Shares -->
+                    <div id="currentShares">
+                        <h6 class="mb-3">
+                            <i class="fas fa-users me-2"></i>People with access
+                        </h6>
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Link Sharing -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="mb-3">
+                            <i class="fas fa-link me-2"></i>Get shareable link
+                        </h6>
+                        <div class="input-group">
+                            <input type="text" id="shareableLink" class="form-control" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyShareableLink()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Anyone with this link can access the file</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -484,6 +621,169 @@
                     form.submit();
                 }
             });
+        }
+
+        function openCommentModal(fileId, fileName) {
+            document.getElementById('commentModalLabel').innerHTML = `<i class="fas fa-comment me-2"></i>Comment on "${fileName}"`;
+            const form = document.getElementById('commentForm');
+            form.action = `/files/${fileId}/comment`;
+            document.getElementById('comment_text').value = '';
+        }
+
+        function openShareModal(fileId, fileName) {
+            document.getElementById('shareModalLabel').innerHTML = `<i class="fas fa-share me-2"></i>Share "${fileName}"`;
+            const form = document.getElementById('shareForm');
+            form.action = `/files/${fileId}/share`;
+
+            // Load current shares
+            loadCurrentShares(fileId);
+
+            // Generate shareable link
+            generateShareableLink(fileId);
+        }
+
+        function loadCurrentShares(fileId) {
+            fetch(`/files/${fileId}/shares`)
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('currentShares');
+                    if (data.success) {
+                        let html = '<h6 class="mb-3"><i class="fas fa-users me-2"></i>People with access</h6>';
+                        if (data.shares.length === 0) {
+                            html += '<p class="text-muted mb-0">No one else has access yet</p>';
+                        } else {
+                            data.shares.forEach(share => {
+                                const accessBadge = getAccessBadge(share.access);
+                                const accessOptions = getAccessOptions(share.access);
+                                html += `
+                                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+                                        <div>
+                                            <strong>${share.email}</strong>
+                                            <br><small class="text-muted">Shared ${share.created_at}</small>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <select class="form-select form-select-sm" style="width: auto;" onchange="changeSharePermission(${share.id}, this.value)">
+                                                ${accessOptions}
+                                            </select>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="removeShare(${share.id})">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+                        container.innerHTML = html;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading shares:', error);
+                });
+        }
+
+        function getAccessBadge(access) {
+            const badges = {
+                'view': '<span class="badge bg-secondary">Viewer</span>',
+                'comment': '<span class="badge bg-info">Commenter</span>',
+                'edit': '<span class="badge bg-warning">Editor</span>',
+                'sign': '<span class="badge bg-success">Signer</span>'
+            };
+            return badges[access] || '<span class="badge bg-secondary">Unknown</span>';
+        }
+
+        function getAccessOptions(currentAccess) {
+            const options = [
+                { value: 'view', label: 'Viewer' },
+                { value: 'comment', label: 'Commenter' },
+                { value: 'edit', label: 'Editor' },
+                { value: 'sign', label: 'Signer' }
+            ];
+
+            return options.map(option =>
+                `<option value="${option.value}" ${option.value === currentAccess ? 'selected' : ''}>${option.label}</option>`
+            ).join('');
+        }
+
+        function changeSharePermission(shareId, newAccess) {
+            fetch(`/shares/${shareId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ access: newAccess })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload shares to show updated permissions
+                    const fileId = document.getElementById('shareForm').action.split('/')[2];
+                    loadCurrentShares(fileId);
+                } else {
+                    alert('Error updating permission: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating permission');
+            });
+        }
+
+        function generateShareableLink(fileId) {
+            fetch(`/files/${fileId}/generate-link`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('shareableLink').value = data.link;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating link:', error);
+                });
+        }
+
+        function copyShareableLink() {
+            const linkInput = document.getElementById('shareableLink');
+            linkInput.select();
+            document.execCommand('copy');
+
+            // Show feedback
+            const btn = event.target.closest('button');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-success');
+
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        }
+
+        function removeShare(shareId) {
+            if (confirm('Are you sure you want to remove this share?')) {
+                fetch(`/shares/${shareId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Reload shares
+                        const fileId = document.getElementById('shareForm').action.split('/')[2];
+                        loadCurrentShares(fileId);
+                    } else {
+                        alert('Error removing share: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error removing share');
+                });
+            }
         }
 
         // Auto-refresh page after successful upload

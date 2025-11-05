@@ -49,6 +49,24 @@ class FilePolicy
         return $file->shares()->where('email',$user->email)->where('access','sign')->exists();
     }
 
+    public function edit(User $user, File $file)
+    {
+        // allow uploader or admin OR shared with edit permission
+        if($user->hasRole('admin')) return true;
+        if($user->id === $file->uploaded_by) return true;
+        // if explicit share with edit permission:
+        return $file->shares()->where('email',$user->email)->whereIn('access',['edit','sign'])->exists();
+    }
+
+    public function comment(User $user, File $file)
+    {
+        // allow uploader, admin, or anyone with view access (since comment is less restrictive than edit)
+        if($user->hasRole('admin')) return true;
+        if($user->id === $file->uploaded_by) return true;
+        // if explicit share with comment or higher permission:
+        return $file->shares()->where('email',$user->email)->whereIn('access',['comment','edit','sign'])->exists();
+    }
+
     public function viewSignature(User $user, File $file)
     {
         return $this->view($user,$file);
