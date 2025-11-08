@@ -24,6 +24,7 @@ class File extends Model
     public function shares(){ return $this->hasMany(related: FileShare::class); }
     public function signature(){ return $this->hasOne(Signature::class); }
     public function comments(){ return $this->hasMany(FileComment::class)->with('user')->latest(); }
+    public function accessRequests(){ return $this->hasMany(FileAccessRequest::class)->with(['requester', 'approver'])->latest(); }
 
     // Access control: owner OR admin OR same-department OR shared email
     public function isAccessibleBy(User $user)

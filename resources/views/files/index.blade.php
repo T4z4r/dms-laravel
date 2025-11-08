@@ -192,6 +192,11 @@
                                                     <i class="fas fa-share"></i>
                                                 </button>
                                             @endcan
+                                            @unless($file->isAccessibleBy(auth()->user()))
+                                                <button class="btn btn-sm btn-outline-warning mx-1" data-bs-toggle="modal" data-bs-target="#requestAccessModal" onclick="openRequestAccessModal({{ $file->id }}, '{{ $file->original_name }}')" title="Request Access">
+                                                    <i class="fas fa-hand-paper"></i>
+                                                </button>
+                                            @endunless
                                             <button class="btn btn-sm btn-outline-danger" onclick="deleteFile({{ $file->id }}, '{{ $file->original_name }}')" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -479,6 +484,40 @@
         </div>
     </div>
 
+    <!-- Request Access Modal -->
+    <div class="modal fade" id="requestAccessModal" tabindex="-1" aria-labelledby="requestAccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="requestAccessForm" method="POST" class="modal-content">
+                @csrf
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="requestAccessModalLabel">
+                        <i class="fas fa-hand-paper me-2"></i>Request Access
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="requested_access" class="form-label">Access Level Requested</label>
+                        <select name="requested_access" id="requested_access" class="form-select" required>
+                            <option value="view">View Only</option>
+                            <option value="comment">Comment</option>
+                            <option value="edit">Edit</option>
+                            <option value="sign">Sign</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="request_message" class="form-label">Request Message (Optional)</label>
+                        <textarea name="request_message" id="request_message" class="form-control" rows="3" placeholder="Explain why you need access to this file..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Send Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Hidden form for delete -->
     <form id="deleteForm" method="POST" style="display: none;">
         @csrf
@@ -628,6 +667,13 @@
             const form = document.getElementById('commentForm');
             form.action = `/files/${fileId}/comment`;
             document.getElementById('comment_text').value = '';
+        }
+
+        function openRequestAccessModal(fileId, fileName) {
+            document.getElementById('requestAccessModalLabel').innerHTML = `<i class="fas fa-hand-paper me-2"></i>Request Access to "${fileName}"`;
+            const form = document.getElementById('requestAccessForm');
+            form.action = `/files/${fileId}/request-access`;
+            document.getElementById('request_message').value = '';
         }
 
         function openShareModal(fileId, fileName) {

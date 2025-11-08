@@ -6,6 +6,7 @@ use App\Models\FileCategory;
 use App\Models\Department;
 use App\Models\FileShare;
 use App\Models\FileComment;
+use App\Models\FileAccessRequest;
 use App\Mail\FileShared;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -337,6 +338,128 @@ class FileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Share removed successfully'
+        ]);
+    }
+
+    // request access to a file
+    public function requestAccess(Request $request, File $file)
+    {
+        $request->validate([
+            'requested_access' => 'required|in:view,comment,edit,sign',
+            'request_message' => 'nullable|string|max:1000'
+        ]);
+
+        // Check if user already has access
+        if ($file->isAccessibleBy(auth()->user())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You already have access to this file'
+            ], 400);
+        }
+
+        // Check if user already has a pending request
+        $existingRequest = FileAccessRequest::where('file_id', $file->id)
+            ->where('requester_id', auth()->id())
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingRequest) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You already have a pending access request for this file'
+            ], 400);
+        }
+
+        FileAccessRequest::create([
+            'file_id' => $file->id,
+            'requester_id' => auth()->id(),
+            'requested_access' => $request->requested_access,
+            'request_message' => $request->request_message
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Access request sent successfully'
+        ]);
+    }
+
+    // list access requests (for approvers)
+    public function accessRequests()
+    {
+        $user = auth()->user();
+
+        // Get requests for files the user can approve (owner, admin, or department head)
+        $requests = FileAccessRequest::with(['file', 'requester'])
+            ->whereHas('file', function($query) use ($user) {
+                $query->where('uploaded_by', $user->id)
+                      ->orWhere('department_id', $user->department_id)
+                      ->orWhere(function($q) use ($user) {
+                          $q->where('department_id', $user->department_id)
+                            ->whereHas('department.users', function($uq) use ($user) {
+                                $uq->where('id', $user->id)->where('role', 'Department Head');
+                            });
+                      });
+            })
+            ->orWhere(function($query) use ($user) {
+                if ($user->hasRole('admin')) {
+                    $query->whereNotNull('id'); // Admin can see all
+                }
+            })
+            ->pending()
+            ->latest()
+            ->paginate(20);
+
+        return view('files.access-requests', compact('requests'));
+    }
+
+    // approve access request
+    public function approveAccessRequest(Request $request, FileAccessRequest $accessRequest)
+    {
+        $this->authorize('share', $accessRequest->file);
+
+        $accessRequest->approve(auth()->user(), $request->response_message);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Access request approved successfully'
+        ]);
+    }
+
+    // reject access request
+    public function rejectAccessRequest(Request $request, FileAccessRequest $accessRequest)
+    {
+        $this->authorize('share', $accessRequest->file);
+
+        $accessRequest->reject(auth()->user(), $request->response_message);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Access request rejected'
+        ]);
+    }
+
+    // get access request details (AJAX)
+    public function getAccessRequest(FileAccessRequest $accessRequest)
+    {
+        $this->authorize('share', $accessRequest->file);
+
+        return response()->json([
+            'success' => true,
+            'request' => [
+                'id' => $accessRequest->id,
+                'file' => [
+                    'original_name' => $accessRequest->file->original_name,
+                    'size' => $accessRequest->file->getSize(),
+                    'extension' => $accessRequest->file->getExtension()
+                ],
+                'requester' => [
+                    'name' => $accessRequest->requester->name,
+                    'email' => $accessRequest->requester->email
+                ],
+                'requested_access' => $accessRequest->requested_access,
+                'request_message' => $accessRequest->request_message,
+                'created_at_formatted' => $accessRequest->created_at->format('M d, Y \a\t H:i')
+            ]
         ]);
     }
 }

@@ -27,6 +27,35 @@
                             <i class="fas fa-trash me-2"></i> Trash
                         </a>
                     </li>
+                    @canany(['share'], \App\Models\File::class)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('access-requests.*') ? 'active' : '' }} d-flex align-items-center" href="{{ route('access-requests.index') }}">
+                                <i class="fas fa-hand-paper me-2"></i> Access Requests
+                                @php
+                                    $pendingRequests = \App\Models\FileAccessRequest::pending()
+                                        ->whereHas('file', function($query) {
+                                            $query->where('uploaded_by', auth()->id())
+                                                  ->orWhere('department_id', auth()->user()->department_id)
+                                                  ->orWhere(function($q) {
+                                                      $q->where('department_id', auth()->user()->department_id)
+                                                        ->whereHas('department.users', function($uq) {
+                                                            $uq->where('id', auth()->id())->where('role', 'Department Head');
+                                                        });
+                                                  });
+                                        })
+                                        ->orWhere(function($query) {
+                                            if (auth()->user()->hasRole('admin')) {
+                                                $query->whereNotNull('id');
+                                            }
+                                        })
+                                        ->count();
+                                @endphp
+                                @if($pendingRequests > 0)
+                                    <span class="badge bg-danger ms-2">{{ $pendingRequests }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endcanany
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('departments.*') ? 'active' : '' }} d-flex align-items-center" href="{{ route('departments.index') }}">
                             <i class="fas fa-building me-2"></i> Departments

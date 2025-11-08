@@ -34,9 +34,13 @@ class FilePolicy
         return $user->hasRole('admin');
     }
 
-    public function share(User $user, File $file)
+    public function share(User $user, File $file = null)
     {
-        return $user->hasRole('admin') || $user->id === $file->uploaded_by;
+        if ($file) {
+            return $user->hasRole('admin') || $user->id === $file->uploaded_by;
+        }
+        // For class-level checks, allow if user is admin (can share any file)
+        return $user->hasRole('admin');
     }
 
     public function sign(User $user, File $file)

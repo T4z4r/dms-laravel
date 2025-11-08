@@ -42,6 +42,13 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/shares/{share}', [FileController::class,'updateShare'])->name('shares.update');
     Route::delete('/shares/{share}', [FileController::class,'removeShare'])->name('shares.remove');
 
+    // access request functionality
+    Route::post('/files/{file}/request-access', [FileController::class,'requestAccess'])->name('files.request-access');
+    Route::get('/access-requests', [FileController::class,'accessRequests'])->name('access-requests.index');
+    Route::get('/access-requests/{request}', [FileController::class,'getAccessRequest'])->name('access-requests.show');
+    Route::post('/access-requests/{request}/approve', [FileController::class,'approveAccessRequest'])->name('access-requests.approve');
+    Route::post('/access-requests/{request}/reject', [FileController::class,'rejectAccessRequest'])->name('access-requests.reject');
+
     Route::post('/files/{id}/restore', [FileController::class,'restore'])->name('files.restore');
     Route::delete('/files/{id}/forceDelete', [FileController::class,'forceDelete'])->name('files.forceDelete');
 
