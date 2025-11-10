@@ -179,9 +179,11 @@
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             @endif
-                                            <a href="{{ route('files.download', $file) }}" class="btn btn-sm btn-outline-success mx-1" title="Download">
-                                                <i class="fas fa-download"></i>
-                                            </a>
+                                            @if($file->canUserDownload(auth()->user()))
+                                                <a href="{{ route('files.download', $file) }}" class="btn btn-sm btn-outline-success mx-1" title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                            @endif
                                             @if($file->canUserComment(auth()->user()))
                                                 <button class="btn btn-sm btn-outline-secondary mx-1" data-bs-toggle="modal" data-bs-target="#commentModal" onclick="openCommentModal({{ $file->id }}, '{{ $file->original_name }}')" title="Comment">
                                                     <i class="fas fa-comment"></i>
@@ -546,6 +548,13 @@
                         const downloadBtn = document.getElementById('downloadBtn');
                         const signBtn = document.getElementById('signBtn');
                         downloadBtn.href = `/files/${fileId}/download`;
+
+                        // Hide download button if user cannot download
+                        if (!file.can_download) {
+                            downloadBtn.style.display = 'none';
+                        } else {
+                            downloadBtn.style.display = 'inline-block';
+                        }
 
                         if (file.can_sign && !file.is_signed) {
                             signBtn.style.display = 'inline-block';

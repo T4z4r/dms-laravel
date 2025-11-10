@@ -12,10 +12,15 @@ class File extends Model
     protected $fillable = [
         'original_name','name','path','mime_type',
         'category_id','department_id','uploaded_by',
-        'is_signed','signed_by','signed_at','share_token','shared_until'
+        'is_signed','signed_by','signed_at','share_token','shared_until',
+        'allowed_users','restricted_departments','access_type'
     ];
 
     protected $dates = ['shared_until','signed_at'];
+    protected $casts = [
+        'allowed_users' => 'array',
+        'restricted_departments' => 'array',
+    ];
 
     public function category(){ return $this->belongsTo(FileCategory::class); }
     public function department(){ return $this->belongsTo(Department::class); }
@@ -26,12 +31,23 @@ class File extends Model
     public function comments(){ return $this->hasMany(FileComment::class)->with('user')->latest(); }
     public function accessRequests(){ return $this->hasMany(FileAccessRequest::class)->with(['requester', 'approver'])->latest(); }
 
-    // Access control: owner OR admin OR same-department OR shared email
+    // Access control: owner OR admin OR same-department OR shared email OR explicitly allowed users (excluding restricted departments)
     public function isAccessibleBy(User $user)
     {
         if(!$user) return false;
         if($user->hasRole('admin')) return true;
         if($this->uploaded_by === $user->id) return true;
+
+        // Check if user's department is restricted
+        if($this->restricted_departments && in_array($user->department_id, $this->restricted_departments)) {
+            return false;
+        }
+
+        // Check if user is explicitly allowed
+        if($this->allowed_users && in_array($user->id, $this->allowed_users)) {
+            return true;
+        }
+
         if($this->department_id && $user->department_id && $this->department_id === $user->department_id) return true;
         if($this->shares()->where('email', $user->email)->whereNotNull('id')->exists()) return true;
         return false;
@@ -54,6 +70,13 @@ class File extends Model
     {
         $access = $this->getUserAccessLevel($user);
         return in_array($access, ['admin', 'owner', 'edit', 'sign']);
+    }
+
+    // Check if user can download this file (based on access_type)
+    public function canUserDownload(User $user)
+    {
+        if(!$this->isAccessibleBy($user)) return false;
+        return $this->access_type === 'downloadable';
     }
 
     // Check if user can comment on this file

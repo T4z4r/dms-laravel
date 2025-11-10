@@ -16,7 +16,7 @@ class FilePolicy
 
     public function download(User $user, File $file)
     {
-        return $file->isAccessibleBy($user);
+        return $file->canUserDownload($user);
     }
 
     public function delete(User $user, File $file)

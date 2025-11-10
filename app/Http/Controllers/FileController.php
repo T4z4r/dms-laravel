@@ -119,6 +119,7 @@ class FileController extends Controller
                     'path' => $file->path,
                     'is_signed' => $file->is_signed,
                     'can_sign' => auth()->user()->can('sign', $file),
+                    'can_download' => $file->canUserDownload(auth()->user()),
                 ]
             ]);
         } catch (\Exception $e) {
@@ -225,12 +226,20 @@ class FileController extends Controller
             'custom_name'=>'nullable|string|max:255',
             'category_id'=>'nullable|exists:file_categories,id',
             'department_id'=>'nullable|exists:departments,id',
+            'allowed_users'=>'nullable|array',
+            'allowed_users.*'=>'exists:users,id',
+            'restricted_departments'=>'nullable|array',
+            'restricted_departments.*'=>'exists:departments,id',
+            'access_type'=>'required|in:view_only,downloadable',
         ]);
 
         $file->update([
             'name' => $request->filled('custom_name') ? $request->custom_name : $file->name,
             'category_id' => $request->category_id,
             'department_id' => $request->department_id,
+            'allowed_users' => $request->allowed_users,
+            'restricted_departments' => $request->restricted_departments,
+            'access_type' => $request->access_type,
         ]);
 
         return redirect()->route('files.index')->with('success', 'File updated successfully');
