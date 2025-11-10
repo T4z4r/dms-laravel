@@ -17,7 +17,7 @@
                             <i class="fas fa-file-alt fa-2x"></i>
                         </div>
                         <h5 class="card-title">Total Files</h5>
-                        <h3>{{ App\Models\File::count() }}</h3>
+                        <h3>{{ $totalFiles }}</h3>
                         <small>Files uploaded</small>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
                             <i class="fas fa-building fa-2x"></i>
                         </div>
                         <h5 class="card-title">Departments</h5>
-                        <h3>{{ App\Models\Department::count() }}</h3>
+                        <h3>{{ $totalDepartments }}</h3>
                         <small>Active departments</small>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                             <i class="fas fa-tags fa-2x"></i>
                         </div>
                         <h5 class="card-title">Categories</h5>
-                        <h3>{{ App\Models\FileCategory::count() }}</h3>
+                        <h3>{{ $totalCategories }}</h3>
                         <small>File categories</small>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                             <i class="fas fa-signature fa-2x"></i>
                         </div>
                         <h5 class="card-title">Signed Documents</h5>
-                        <h3>{{ App\Models\Signature::count() }}</h3>
+                        <h3>{{ $totalSignatures }}</h3>
                         <small>Documents signed</small>
                     </div>
                 </div>
@@ -156,9 +156,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $recentFiles = App\Models\File::with('uploader', 'department', 'category')->latest()->limit(5)->get();
-                            @endphp
                             @forelse ($recentFiles as $file)
                                 <tr>
                                     <td>{{ $file->original_name }}</td>
