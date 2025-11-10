@@ -30,15 +30,21 @@ class FileController extends Controller
         if($user->hasRole('admin')){
             $query = File::with('category','department','uploader')->latest();
         } else {
-            // files accessible by the user (owned, same dept, shared)
+            // files accessible by the user (owned, shared, or explicitly allowed)
+            // Department access is now controlled by allowed_users and restricted_departments
             $query = File::with('category','department','uploader')
                 ->where(function($q) use ($user) {
                     $q->where('uploaded_by', $user->id)
-                      ->orWhere('department_id', $user->department_id)
                       ->orWhereHas('shares', function($sq) use ($user) {
                           $sq->where('email', $user->email);
-                      });
-                })->latest();
+                      })
+                      ->orWhereJsonContains('allowed_users', $user->id);
+                })
+                ->where(function($q) use ($user) {
+                    $q->whereNull('restricted_departments')
+                      ->orWhereJsonDoesntContain('restricted_departments', $user->department_id);
+                })
+                ->latest();
         }
 
         if($request->filled('category_id')) $query->where('category_id',$request->category_id);

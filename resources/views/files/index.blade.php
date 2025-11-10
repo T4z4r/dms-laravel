@@ -199,9 +199,11 @@
                                                     <i class="fas fa-hand-paper"></i>
                                                 </button>
                                             @endunless
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteFile({{ $file->id }}, '{{ $file->original_name }}')" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            @if($file->canUserEdit(auth()->user()))
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteFile({{ $file->id }}, '{{ $file->original_name }}')" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
