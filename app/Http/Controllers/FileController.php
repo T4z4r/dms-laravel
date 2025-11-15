@@ -62,7 +62,7 @@ class FileController extends Controller
             'file'=>'required|file|max:51200', // 50MB
             'custom_name'=>'nullable|string|max:255',
             'category_id'=>'nullable|exists:file_categories,id',
-            'department_id'=>'nullable|exists:departments,id',
+            'department_id'=>'nullable|exists:department,id',
             'default_access'=>'nullable|in:view,comment,edit,sign',
         ]);
 
@@ -224,21 +224,22 @@ class FileController extends Controller
     }
 
     // update file metadata
-    public function update(Request $request, File $file)
+    public function update(Request $request, $id)
     {
-        $this->authorize('edit', $file);
+        $file=File::where('id',$id)->first();
+        dd($id);
+        // $this->authorize('edit', $file);
 
         $request->validate([
             'custom_name'=>'nullable|string|max:255',
             'category_id'=>'nullable|exists:file_categories,id',
-            'department_id'=>'nullable|exists:departments,id',
+            'department_id'=>'nullable',
             'allowed_users'=>'nullable|array',
-            'allowed_users.*'=>'exists:users,id',
+            'allowed_users.*'=>'exists:employee,id',
             'restricted_departments'=>'nullable|array',
             'restricted_departments.*'=>'exists:departments,id',
             'access_type'=>'required|in:view_only,downloadable',
         ]);
-
         $file->update([
             'name' => $request->filled('custom_name') ? $request->custom_name : $file->name,
             'category_id' => $request->category_id,
