@@ -227,7 +227,6 @@ class FileController extends Controller
     public function update(Request $request, $id)
     {
         $file=File::where('id',$id)->first();
-        dd($id);
         // $this->authorize('edit', $file);
 
         $request->validate([
